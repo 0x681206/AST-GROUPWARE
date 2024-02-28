@@ -1,0 +1,23 @@
+use[GROUPWAREDB]
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[T_REPORTCOMMENT_READ]') AND type in (N'U'))
+DROP TABLE [dbo].[T_REPORTCOMMENT_READ]
+GO
+
+CREATE TABLE [dbo].[T_REPORTCOMMENT_READ](
+	[report_no] [int] NOT NULL,
+	[comment_no] [int] NOT NULL,
+	[staf_cd] [int] NOT NULL,
+	[alreadyread_flg] [bit] NOT NULL,
+	[update_user] [varchar](10) NOT NULL,
+	[update_date] [datetime2](7) NOT NULL,
+ CONSTRAINT [PK_T_REPORT_COMMENT_READ] PRIMARY KEY CLUSTERED 
+(
+	[report_no] ASC,
+	[comment_no] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO

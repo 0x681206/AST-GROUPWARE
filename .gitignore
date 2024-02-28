@@ -1,0 +1,17 @@
+/web-groupware/bin/Debug/
+/web-groupware/obj/Debug/
+/.vs/
+/Common/bin/Debug/
+/Common/bin/Release/
+/Common/obj/Debug/
+/Common/obj/Release/
+
+/web-groupware/Migrations/
+/Common/obj/
+/web-groupware/wwwroot/uploads/
+/web-groupware/wwwroot/downloads/
+/web-groupware/obj/
+/web-groupware/Properties/launchSettings.json
+/web-groupware/Properties/PublishProfiles/FolderProfile.pubxml
+/web-groupware/Properties/PublishProfiles/FolderProfile.pubxml.user
+/web-groupware/bin/Release/

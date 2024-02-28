@@ -1,0 +1,110 @@
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@model RestrationReportViewModel;
+
+@{
+    ViewData["Title"] = "退去修繕";
+
+}
+
+<main class="">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box page-title-box-alt">
+                    <h4 class="page-title">退去修繕</h4>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body p-3">
+                <form id="frm" asp-controller="RestrationReport" asp-action="Index" method="post">
+
+                    <div class="row mb-2">
+                        <div class="col-1">
+                            <span>退去日</span>
+                        </div>
+                        <div class="col-6">
+                            <div class="input-group" style="width:300px;">
+                                <input type="date" asp-for="@Model.cond_leaving_date_from" class="form-control form-control-sm">
+                                <div class="input-group-prepend input-group-sm">
+                                    <div class="input-group-text">～</div>
+                                </div>
+                                <input type="date" asp-for="@Model.cond_leaving_date_to" class="form-control form-control-sm">
+
+                            </div>
+                        </div>
+
+                        <div class="col-1">
+                            <span>社員</span>
+                        </div>
+                        <div class="col-4">
+                            <input asp-for="@Model.cond_staf_cd">
+                        </div>
+
+                    </div>
+                    <div class="row justify-content-end">
+                        <div class="col text-end">
+                            <button type="submit" id="" class="btn btn-info">　　検　索　　</button>
+                        </div>
+                    </div>
+                </form>
+
+                <table class="table datatables">
+
+                    <thead class="">
+                        <tr>
+
+                            <th style="width:12%">発注番号</th>
+                            <th style="">物件名</th>
+                            <th style="width:10%">号室</th>
+                            <th style="width:12%">立会日</th>
+                            <th style="width:12%">立合担当</th>
+                            <th style="width:12%">工事日</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        @foreach (var capsule in Model.list_report)
+                        {
+                            <tr>
+                                <td>
+                                    <span>
+                                        @capsule.hachu_no
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>@capsule.bukken_name</span>
+                                </td>
+                                <td>
+                                    <span>@capsule.room_no</span>
+                                </td>
+                                <td>
+                                    <span>@capsule.leaving_date</span>
+                                </td>
+                                <td>
+                                    <span>@capsule.staf_name</span>
+                                </td>
+                                <td>
+                                    <span>@capsule.restoration_date</span>
+                                </td>
+                            </tr>
+
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        // <script src="/js/BukkenMemo.js" asp-append-version="true"></script>
+    }
+}
+

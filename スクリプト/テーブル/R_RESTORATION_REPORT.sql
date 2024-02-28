@@ -1,0 +1,22 @@
+use[GROUPWAREDB]
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[R_RESTORATION_REPORT]') AND type in (N'U'))
+DROP TABLE [dbo].[R_RESTORATION_REPORT]
+GO
+
+CREATE TABLE [dbo].[R_RESTORATION_REPORT](
+	[hachu_no] [int] NOT NULL,
+	[bukken_name] [nvarchar](30) NOT NULL,
+	[room_no] [int] NOT NULL,
+	[leaving_date] [date] NOT NULL,
+	[leaving_staffcd] [int] NOT NULL,
+	[restoration_date] [date] NOT NULL,
+ CONSTRAINT [PK_R_RESTORATION_REPORT] PRIMARY KEY CLUSTERED 
+(
+	[hachu_no] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO

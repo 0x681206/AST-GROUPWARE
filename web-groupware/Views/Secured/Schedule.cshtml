@@ -1,0 +1,104 @@
+﻿@model web_groupware.Models.ScheduleViewModel
+@{
+    ViewData["Title"] = "スケジュール";
+}
+
+<h1>Schedule View</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="schedule_no" />
+            <div class="form-group">
+                <label asp-for="schedule_type" class="control-label"></label>
+
+                <select asp-for="schedule_type" class="form-control" disabled>
+                    <option value="1">会議</option>
+                    <option value="2">来客</option>
+                    <option value="3">外出</option>
+                    <option value="4">出張</option>
+                    <option value="5">休み</option>
+                </select>
+                <span asp-validation-for="schedule_type" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="allday" disabled /> @Html.DisplayNameFor(model => model.allday)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="start_datetime" class="control-label"></label>
+                <input asp-for="start_datetime" class="form-control" readonly/>
+                <span asp-validation-for="start_datetime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="end_datetime" class="control-label"></label>
+                <input asp-for="end_datetime" class="form-control" readonly/>
+                <span asp-validation-for="end_datetime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="title" class="control-label"></label>
+                <input asp-for="title" class="form-control" readonly />
+                <span asp-validation-for="title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="memo" class="control-label"></label>
+                <input asp-for="memo" class="form-control" readonly />
+                <span asp-validation-for="memo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="People" class="control-label"></label>
+
+                <select asp-for="People" class="form-control" multiple>
+                    @if (Model.People != null && Model.T_STAFFM != null)
+                    {
+                        @for (int i = 0; i < Model.T_STAFFM.Count; i++)
+                        {
+                            @foreach (var item in Model.People)
+                            {
+                                @if (Model.T_STAFFM[i].staf_cd == item.staf_cd)
+                                {
+                                    <option value="@item.staf_cd">@Model.T_STAFFM.Where(m => m.staf_cd == item.staf_cd).First().staf_name</option>
+                                }
+                            }
+                        }
+                    }
+                </select>
+                <span asp-validation-for="People" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Places" class="control-label"></label>
+                
+                <select asp-for="Places" class="form-control" multiple>
+                    @if (Model.Places != null)
+                    {
+                        @for (var i = 0; i < Model.Places.Count; i++)
+                        {
+                            @foreach (var item in Model.Places)
+                            {
+                                if (item.place_cd == Model.Places[i].place_cd)
+                                {
+                                    <option value="@item.place_cd">@Model.T_PLACEM.Where(m => m.place_cd == item.place_cd).First().place_name</option>
+                                }
+                            }
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Delete" asp-route-id="@Model.schedule_no" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this item?')">Delete</a>
+    <a asp-action="Schedule_edit" asp-route-schedule_no="@Model.schedule_no" asp class="btn btn-primary">Edit</a>
+    <a asp-action="Personal_week" class="btn btn-primary">Back to List</a>
+    
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

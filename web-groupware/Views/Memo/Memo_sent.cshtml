@@ -1,0 +1,39 @@
+﻿@model web_groupware.Models.MemoViewModel;
+@{
+    ViewData["Title"] = "伝言・電話メモ";
+}
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="~/css/memo.css" rel="stylesheet" />
+</head>
+
+<body class="loading">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box page-title-box-alt">
+                <h4 class="page-title">伝言・電話メモ （自分作成）</h4>
+            </div>
+        </div>
+    </div>
+    
+    @{
+        await Html.RenderPartialAsync("_MemoBody", Model);
+    }
+
+</body>
+</html>
+
+@section Scripts {
+    <script>
+        $("#filter_state").val(@Model.selectedState);
+        $("#filter_user").val(@Model.selectedUser);
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        <script src="~/js/Memo.js"></script>
+    }
+}

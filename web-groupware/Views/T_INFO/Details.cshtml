@@ -1,0 +1,49 @@
+﻿@*@model web_groupware.Models.T_INFO
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>T_INFO</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.info_cd)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.info_cd)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.title)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.title)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.message)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.message)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.update_user)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.update_user)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.update_date)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.update_date)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>
+*@

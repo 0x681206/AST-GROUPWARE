@@ -1,0 +1,323 @@
+﻿@using web_groupware.Utilities
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model web_groupware.Models.GroupViewModel;
+@{
+    ViewData["Title"] = "スケジュール";
+}
+
+@section Styles {
+    <link href="~/css/schedule/bootstrap.main.min.css" rel="stylesheet" />
+    <link href="~/css/schedule/creative.app.min.css" rel="stylesheet" />
+    <link href="~/css/schedule/creative.bootstrap.min.css" rel="stylesheet" />
+    <link href="~/css/schedule/daygrid.main.min.css" rel="stylesheet" />
+    <link href="~/css/schedule/list.main.min.css" rel="stylesheet" />
+    <link href="~/css/schedule/main.min.css" rel="stylesheet" />
+    <link href="~/css/schedule/timegrid.main.min.css" rel="stylesheet" />
+}
+
+<script src="~/js/schedule/bootstrap.main.min.js"></script>
+<script src="~/js/schedule/core.main.min.js"></script>
+<script src="~/js/schedule/list.main.min.js"></script>
+<script src="~/js/schedule/interaction.main.min.js"></script>
+<script src="~/js/schedule/min.moment.min.js"></script>
+<script src="~/js/schedule/timegrid.main.js"></script>
+
+<div class="content">
+    <!-- Start Content-->
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-xl-12 display-inline gap-1">
+                                <div id="external-events">
+                                    <a class="btn btn-success" id="btn-new-event">
+                                        <i class="bi bi-plus"></i>
+                                        予定を登録する
+                                    </a>
+                                </div>
+                                <div class=""id="external-events">
+                                    <select class="btn btn-success height-full width-150" id="filterSelect">
+                                        <option value="G-0" selected>全員</option>
+                                        @foreach (T_GROUPM item in Model.T_GROUPM)
+                                        {
+                                            <option value="G-@item.group_cd">@item.group_name</option>
+                                        }
+                                        <option disabled></option>
+                                        <option value="P-0">全施設</option>
+                                        @foreach (T_PLACEM item in Model.T_PLACEM)
+                                        {
+                                            <option value="P-@item.place_cd">@item.place_name</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div> <!-- end col-->
+
+                            <div class="col-xl-12">
+                                <div class="mt-4 mt-xl-0">
+                                    <div id="calendar"></div>
+                                </div>
+                            </div> <!-- end col -->
+
+                        </div>  <!-- end row -->
+                    </div> <!-- end card body-->
+                </div> <!-- end card -->
+                <!-- Add New Event MODAL -->
+                <div class="modal fade" id="event-modal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header py-3 px-4 border-bottom-0 d-block">
+                                <button type="button" class="btn-close float-end" data-bs-dismiss="modal" aria-label="Close"></button>
+                                <h5 class="modal-title" id="modal-title"> <span class="vr_panelHeaderTitle">2023年11月26日（日）</span></h5>
+                            </div>
+                            <div class="modal-body px-4 pb-4 pt-0">
+                                <form class="needs-validation" name="event-form" id="form-event" novalidate>
+                                    <div class="row">
+                                        <div class="vr_panelContent">
+                                            <div class="vr_panelHeader vr_alignCenter" style="cursor: move;">
+                                                <span class="vr_panelDate" id="modal-date">2023年11月26日（日）</span>
+                                            </div>
+                                            <div class="vr_panelBody">
+                                                <select name="sUID" style="display:none">
+                                                    <option value="104"></option>
+                                                </select>
+                                                <table class="formTable">
+                                                    <script language="JavaScript" type="text/javascript">
+                                                        <!--
+                                                        function CheckScheduleDataForm(form) {
+                                                            var message = "";
+
+                                                            var setdateDay = 0;
+                                                            var enddateDay = 0;
+                                                            var settimeHour = form.elements["startHour"].selectedIndex;
+                                                            var settimeMinute = form.elements["startMinute"].selectedIndex;
+                                                            var endtimeHour = form.elements["endHour"].selectedIndex;
+                                                            var endtimeMinute = form.elements["endMinute"].selectedIndex;
+
+                                                            var settimeHourNull = true;
+                                                            var endtimeHourNull = true;
+
+                                                            if ((settimeHour != 0) && (settimeHour != 9)) {
+                                                                settimeHourNull = false;
+                                                            }
+                                                            if ((endtimeHour != 0) && (endtimeHour != 9)) {
+                                                                endtimeHourNull = false;
+                                                            }
+
+                                                            if (settimeHourNull && !endtimeHourNull) {
+                                                                message = message + "開始時刻が入力されていません。\n";
+                                                            }
+
+                                                            if (!settimeHourNull && !endtimeHourNull && (setdateDay == enddateDay)) {
+                                                                if ((settimeHour > endtimeHour)) {
+                                                                    message = message + "開始時刻が不正です。\n";
+                                                                }
+
+                                                                else if (endtimeHour == settimeHour) {
+                                                                    if (((settimeMinute > 1) && (endtimeMinute <= 1)) ||
+                                                                        ((endtimeMinute > 1) && (settimeMinute > endtimeMinute)))
+                                                                        message = message + "開始時刻が不正です。\n";
+                                                                }
+                                                            }
+
+                                                            var bUserNoValue = true;
+                                                            var bFacilityNoValue = true;
+
+                                                            if ((form.sUID.selectedIndex < 0) || (form.sUID.options[form.sUID.selectedIndex].value == "")) {
+                                                                if (form.sUID.selectedIndex >= 0) {
+                                                                    for (var item in form.sUID.options) {
+                                                                        if (item.value) {
+                                                                            bUserNoValue = false;
+                                                                            break;
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                            else {
+                                                                bUserNoValue = false;
+                                                            }
+                                                            if (bUserNoValue && bFacilityNoValue) {
+                                                                message = message + "参加者が選択されていません\n";
+                                                            }
+                                                            if (message.length) {
+                                                                alert(message);
+                                                                return false;
+                                                            }
+
+                                                            if (!CheckSimpleReplyForm(form)) {
+                                                                return false;
+                                                            }
+                                                            return true;
+                                                        }
+                                                        -->
+                                                    </script>
+                                                </table>
+                                            </div>
+                                            <div class="col-12">
+                                                <div class="mb-2">
+                                                    <label class="control-label form-label">参加者　：　</label>
+                                                    <label class="control-label form-label">@User.FindFirst(ClaimTypes.STAF_NAME)?.Value </label>
+                                                </div>
+                                            </div>
+                                        <div class="col-12">
+                                            <div class="mb-2 row">
+                                                <div class="col-md-3">
+                                                    <label class="control-label form-label">終日</label>
+                                                    <input type="checkbox" class="allDay" id="allDay" />
+                                                </div>
+                                                <div class="col-md-9" id="daytime">
+                                                    <label class="control-label form-label">時刻</label>
+                                                    <input type="hidden" name="Unit" value="5">
+                                                    <select name="startHour" id="startHour" class="SetTimeHourSimpleEntry" style="margin-right: 5px;" ¥¥="" title="時">
+                                                        <option value="0">0時</option>
+                                                        <option value="1">1時</option>
+                                                        <option value="2">2時</option>
+                                                        <option value="3">3時</option>
+                                                        <option value="4">4時</option>
+                                                        <option value="5">5時</option>
+                                                        <option value="6">6時</option>
+                                                        <option value="7">7時</option>
+                                                        <option value="8">8時</option>
+                                                        <option value="9">9時</option>
+                                                        <option value="10">10時</option>
+                                                        <option value="11">11時</option>
+                                                        <option value="12">12時</option>
+                                                        <option value="13">13時</option>
+                                                        <option value="14">14時</option>
+                                                        <option value="15">15時</option>
+                                                        <option value="16">16時</option>
+                                                        <option value="17">17時</option>
+                                                        <option value="18">18時</option>
+                                                        <option value="19">19時</option>
+                                                        <option value="20">20時</option>
+                                                        <option value="21">21時</option>
+                                                        <option value="22">22時</option>
+                                                        <option value="23">23時</option>
+                                                    </select>
+                                                    <select name="startMinute" id="startMinute" class="SetTimeMinuteSimpleEntry" title="分">
+                                                        <option value="">--分</option>
+                                                        <option value="0">00分</option>
+                                                        <option value="5">05分</option>
+                                                        <option value="10">10分</option>
+                                                        <option value="15">15分</option>
+                                                        <option value="20">20分</option>
+                                                        <option value="25">25分</option>
+                                                        <option value="30">30分</option>
+                                                        <option value="35">35分</option>
+                                                        <option value="40">40分</option>
+                                                        <option value="45">45分</option>
+                                                        <option value="50">50分</option>
+                                                        <option value="55">55分</option>
+                                                    </select>
+                                                    <span>
+                                                        ～
+                                                    </span>
+                                                    <select name="endHour" id="endHour" class="EndTimeHourSimpleEntry" style="margin-right: 5px;" ¥¥="" title="時">
+                                                        <option value="0">0時</option>
+                                                        <option value="1">1時</option>
+                                                        <option value="2">2時</option>
+                                                        <option value="3">3時</option>
+                                                        <option value="4">4時</option>
+                                                        <option value="5">5時</option>
+                                                        <option value="6">6時</option>
+                                                        <option value="7">7時</option>
+                                                        <option value="8">8時</option>
+                                                        <option value="9">9時</option>
+                                                        <option value="10">10時</option>
+                                                        <option value="11">11時</option>
+                                                        <option value="12">12時</option>
+                                                        <option value="13">13時</option>
+                                                        <option value="14">14時</option>
+                                                        <option value="15">15時</option>
+                                                        <option value="16">16時</option>
+                                                        <option value="17">17時</option>
+                                                        <option value="18">18時</option>
+                                                        <option value="19">19時</option>
+                                                        <option value="20">20時</option>
+                                                        <option value="21">21時</option>
+                                                        <option value="22">22時</option>
+                                                        <option value="23">23時</option>
+                                                        <option value="24">24時</option>
+                                                    </select>
+                                                    <select name="endMinute" id="endMinute" class="EndTimeMinuteSimpleEntry" title="分">
+                                                        <option value="0">00分</option>
+                                                        <option value="5">05分</option>
+                                                        <option value="10">10分</option>
+                                                        <option value="15">15分</option>
+                                                        <option value="20">20分</option>
+                                                        <option value="25">25分</option>
+                                                        <option value="30">30分</option>
+                                                        <option value="35">35分</option>
+                                                        <option value="40">40分</option>
+                                                        <option value="45">45分</option>
+                                                        <option value="50">50分</option>
+                                                        <option value="55">55分</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="mb-2">
+                                                <label class="control-label form-label">Category</label>
+                                                <select class="form-control form-select" name="category" id="event-category" required>
+                                                    <option value="0" selected>--</option>
+                                                    <option value="1">会議</option>
+                                                    <option value="2">来客</option>
+                                                    <option value="3">外出</option>
+                                                    <option value="4">出張</option>
+                                                    <option value="5">休み</option>
+                                                </select>
+                                                <div class="invalid-feedback">Please select a valid event category</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="mb-2">
+                                                <label class="control-label form-label">タイトル</label>
+                                                <input class="form-control" placeholder="タイトル"
+                                                       type="text" name="title" id="event-title" required />
+                                                <div class="invalid-feedback">Please provide a valid event name</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="mb-2">
+                                                <label class="control-label form-label">メモ</label>
+                                                <textarea class="textareaData" placeholder="メモを入力してください。"
+                                                          type="text" name="memo" id="event-memo" cols="50" rows="5" title="メモ" wrap="soft"></textarea>
+                                                <div class="invalid-feedback">Please provide a valid event name</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-6">
+                                            <button type="button" class="btn btn-danger" id="btn-delete-event">Delete</button>
+                                            <a href="Schedule_Create">詳細設定へ</a>
+                                        </div>
+                                        <div class="col-6 text-end">
+                                            <button type="button" class="btn btn-light me-1" data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="btn btn-success" id="btn-save-event">Save</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div> <!-- end modal-content-->
+                    </div> <!-- end modal dialog-->
+                </div>
+                <!-- end modal-->
+            </div>
+            <!-- end col-12 -->
+        </div> <!-- end row -->
+    </div> <!-- container-fluid -->
+</div>
+
+@section Scripts {
+    <script src="~/js/schedule/bootstrap.main.min.js"></script>
+    <script src="~/js/schedule/core.main.js"></script>
+    <script src="~/js/schedule/daygrid.main.js"></script>
+    <script src="~/js/schedule/interaction.main.min.js"></script>
+    <script src="~/js/schedule/min.moment.min.js"></script>
+    <script src="~/js/schedule/calendar(group-week).js"></script>
+    <script src="~/js/schedule/timegrid.main.js"></script>
+}

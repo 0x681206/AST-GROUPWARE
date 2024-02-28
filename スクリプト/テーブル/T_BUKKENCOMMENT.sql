@@ -1,0 +1,22 @@
+use[GROUPWAREDB]
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[T_BUKKENCOMMENT]') AND type in (N'U'))
+DROP TABLE [dbo].[T_BUKKENCOMMENT]
+GO
+
+CREATE TABLE [dbo].[T_BUKKENCOMMENT](
+	[bukken_cd] [int] NOT NULL,
+	[comment_cd] [int] NOT NULL,
+	[message] [nvarchar](1000) NOT NULL,
+	[update_user] [varchar](10) NOT NULL,
+	[update_date] [datetime2](7) NOT NULL,
+ CONSTRAINT [PK_T_BUKKENCOMMENT] PRIMARY KEY CLUSTERED 
+(
+	[bukken_cd] ASC,
+	[comment_cd] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO

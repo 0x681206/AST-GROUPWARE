@@ -1,0 +1,156 @@
+﻿@model NoticeViewModel
+
+@{
+#pragma warning disable CS8600, CS8601, CS8602, CS8604, CS8618, CS8629
+    ViewData["Title"] = "社内連絡";
+}
+<head>
+    <style>
+        .dropdown-menu.show {
+            top: 81px !important;
+            left: 12px !important;
+        }
+
+        .dropdown-item {
+            padding-right: 0px;
+            padding-left: 0px;
+        }
+
+        .fileAreaHeitWidth {
+            min-width: 92px;
+            max-width: 92px;
+        }
+
+        .fileAreaInnerWidth {
+            min-width: 80px;
+            max-width: 80px;
+        }
+    </style>
+</head>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box page-title-box-alt">
+                <h4 class="page-title">社内連絡</h4>
+            </div>
+        </div>
+    </div>
+    @*エラーメッセージ表示*@
+    <form id="frm" method="post" asp-controller="Notice" asp-action="Create" enctype="multipart/form-data">
+        <div class="row text-danger p-3" asp-validation-summary="ModelOnly"></div>
+        <input type="hidden" asp-for="@Model.Work_dir">
+
+        <div class="card">
+            <div class="card-body p-3">
+                @*                <h5 class="font-18 mt-0 text-center">社内通知</h5>
+                *@
+                <div class="row">
+                    @*                     <div class="col-12 col-sm-2">
+                    <div class="mb-3">
+                    <label for="comments" class="form-label">内容</label>
+                    </div>
+                    </div>
+                    *@
+                    <div class="col-12">
+                        <div class="mb-3">
+                            <textarea asp-for="@Model.Message" rows="7" class="form-control" placeholder=""></textarea>
+                        </div>
+                        <div>
+                            <span asp-validation-for="@Model.Message" class="text-danger"></span>
+                        </div>
+                    </div>
+                    @*                     <div class="col-12">
+                    <button class="fileupload btn btn-success waves-effect waves-light">
+                    選択
+                    <input asp-for="@Model.File" class="upload">
+                    </button>
+                    <span class="fileupload waves-light p-2" id="fileName_span">@Model.fileName</span>
+
+                    <input type="hidden" asp-for="@Model.fileName" class="pl-3 border-0" style="outline: none; " readonly>
+
+                    <button type='button' id="remove" class="fileupload btn btn-danger waves-effect waves-light">
+                    削除
+                    </button>
+                    </div>
+                    *@
+                </div>
+                @***********************************************************************************@
+
+                <div class="row" id="div_icon">
+                    @if (Model.List_T_INFO_FILE.Count != 0)
+                    {
+                        @for (int i = 0; i < Model.List_T_INFO_FILE.Count; i++)
+                        {
+                            <div id="div_icon_@i" class="div_icon_child dropdown fileAreaHeitWidth">
+                                <input type="hidden" asp-for="@Model.List_T_INFO_FILE[i].fileName">
+                                <input type="hidden" asp-for="@Model.List_T_INFO_FILE[i].file_no">
+                                    <button class="bg-white border-0 p-0 dropdown-toggle btn_file fileAreaInnerWidth" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <div class="div_tooltip" data-toggle="tooltip" data-placement="top" title="@Model.List_T_INFO_FILE[i].fileName">
+
+                                        <div class="div_img_file bg-light p-2">
+                                            @{
+                                                var icon = System.IO.Path.GetExtension(Model.List_T_INFO_FILE[i].fileName).Remove(0, 1) + ".svg";
+                                            }
+
+                                            <img src="~/images/file-icons/@icon" alt="icon" class="">
+                                        </div>
+                                        <div class="text-wrap main_files">@Model.List_T_INFO_FILE[i].fileName</div>
+                                        @*<div class="upload-item__overlay -error d-none">
+                                <span class="upload-item__error">
+                                <svg role="image" class="icon -large">
+                                <use xlink:href="/images/svg/sprite.symbol.svg#icon_alert">
+                                </use>
+                                </svg>
+                                </span>
+                                </div>
+                                <div class="">
+                                <progress class="fileAreaInnerWidth" value="0" id="prog_@i" max=100></progress>
+                                </div>
+                                *@
+                                    </div>
+                                    </button>
+                                <ul class="dropdown-menu fileAreaInnerWidth text-center">
+                                    <button class="dropdown-item delete_file" type="button" role="button" id="delete_@i" data-dir_kind="1" data-file_name="@Model.List_T_INFO_FILE[i].fileName">削除</button>
+                                    <button class="dropdown-item download_file" type="button" role="button" data-dir_kind="1" data-file_name="@Model.List_T_INFO_FILE[i].fileName">ﾀﾞｳﾝﾛｰﾄﾞ</button>
+                                </ul>
+                            </div>
+
+                        }
+                    }
+                </div>
+                <div class="row" id="fileArea">
+                    <div class="col-12 card dropArea border-0 p-2">
+                        <div class="text-center px-3 py-3 border-primary" style="border:dashed!important;">
+                            <span>ファイルをドラッグ＆ドロップするかクリップボードから画像を貼り付けしてください　または　</span>
+                            <label class="input-group-btn hand-pointer">
+                                <span class="btn btn-secondary">
+                                    ファイル選択<input type="file" multiple class="d-none" asp-for="@Model.File">
+                                </span>
+                            </label>
+                            <br>
+                            <span>ファイル追加（Shiftキーを押しながらファイルを複数選択可能）</span>
+                        </div>
+                        <div id="message_file1" class="text-right"></div>
+                    </div>
+                </div>
+
+                @***********************************************************************************@
+                <div class="row text-center">
+                    <div class="col">
+                        <button type="button" class="btn btn-info kakuninDialog">　　登　録　　</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+    }
+    <script src="~/js/Notice.js" asp-append-version="true"></script>
+}
+
+

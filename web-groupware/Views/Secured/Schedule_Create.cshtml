@@ -1,0 +1,308 @@
+﻿@model web_groupware.Models.ScheduleViewModel
+@{
+
+    ViewData["Title"] = "Edit";
+}
+
+<style>
+    .display-flex {
+        display:flex;
+    }
+    .flex {
+        flex:1;
+    }
+</style>
+
+<h1>Create</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <div>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @* <input type="hidden" asp-for="schedule_no" id="schedule_no" /> *@
+            <div class="form-group">
+                <label asp-for="schedule_type" class="control-label"></label>
+                <select asp-for="schedule_type" id="schedule_type" class="form-control">
+                    <option value="1">会議</option>
+                    <option value="2">来客</option>
+                    <option value="3">外出</option>
+                    <option value="4">出張</option>
+                    <option value="5">休み</option>
+                </select>
+                <span asp-validation-for="schedule_type" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="allday" id="allday" /> @Html.DisplayNameFor(model => model.allday)
+                </label>
+            </div>
+            <div class="form-group">
+                <label asp-for="start_datetime" class="control-label"></label>
+                <input asp-for="start_datetime" class="form-control" id="start_datetime" />
+                <span asp-validation-for="start_datetime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="end_datetime" class="control-label"></label>
+                <input asp-for="end_datetime" class="form-control" id="end_datetime" />
+                <span asp-validation-for="end_datetime" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="title" class="control-label"></label>
+                <input asp-for="title" class="form-control" id="title" />
+                <span asp-validation-for="title" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="memo" class="control-label"></label>
+                <input asp-for="memo" class="form-control" id="memo" />
+                <span asp-validation-for="memo" class="text-danger"></span>
+            </div>
+            <div class="form-group display-flex">
+                <div class="flex-1">
+                    <label asp-for="People" class="control-label"></label>
+                    <select asp-for="People" class="form-control" id="People" multiple>
+                        @if (Model.People != null && Model.T_STAFFM!=null)
+                        {
+                            @for (int i = 0; i < Model.T_STAFFM.Count; i++)
+                            {
+                                @foreach (var item in Model.People)
+                                {
+                                    @if (Model.T_STAFFM[i].staf_cd == item.staf_cd)
+                                    {
+                                        <option value="@item.staf_cd">@Model.T_STAFFM.Where(m => m.staf_cd == item.staf_cd).First().staf_name</option>
+                                    }
+                                }
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="People" class="text-danger"></span>
+                </div>
+                <div class="flex-1">
+                    <label asp-for="T_STAFFM" class="control-label"></label>
+                    <select asp-for="T_STAFFM" class="form-control" id="T_STAFFM" multiple>
+                        @if (Model.T_STAFFM != null)
+                        {
+                            @foreach (var item in Model.T_STAFFM)
+                            {
+                                <option value="@item.staf_cd">@item.staf_name</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="T_STAFFM" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="form-group display-flex">
+                <div class="flex-1">
+                    <label asp-for="Places" class="control-label"></label>
+                    <select asp-for="Places" class="form-control" id="Places" multiple>
+                        @if (Model.Places != null)
+                        {
+                            @for (var i = 0; i < Model.Places.Count; i++)
+                            {
+                                @foreach (var item in Model.Places)
+                                {
+                                    if(item.place_cd == Model.Places[i].place_cd){
+                                    <option value="@item.place_cd">@Model.T_PLACEM.Where(m => m.place_cd == item.place_cd).First().place_name</option>
+                                    }
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label asp-for="T_PLACEM" class="control-label"></label>
+                    <select asp-for="T_PLACEM" class="form-control" id="T_PLACEM" multiple>
+                        @if (Model.T_PLACEM != null)
+                        {
+                            @foreach (var item in Model.T_PLACEM)
+                            {
+                                <option value="@item.place_cd">@item.place_name</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="button" onclick="save_data()" value="Save" class="btn btn-primary" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var currentDatetime = new Date();
+
+        var year = currentDatetime.getFullYear();
+        var month = (currentDatetime.getMonth() + 1).toString().padStart(2, '0');
+        var day = currentDatetime.getDate().toString().padStart(2, '0');
+        var hours = currentDatetime.getHours().toString().padStart(2, '0');
+        var minutes = currentDatetime.getMinutes().toString().padStart(2, '0');
+
+        var formattedDatetime = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes;
+        console.log(formattedDatetime);
+        $("#start_datetime").val(formattedDatetime);
+        $("#end_datetime").val(formattedDatetime);
+    });
+
+    var startDatetimeInput = document.getElementById("start_datetime");
+    var endDatetimeInput = document.getElementById("end_datetime");
+
+    // Add event listener to start datetime input
+    startDatetimeInput.addEventListener("change", function () {
+        var startDatetime = new Date(startDatetimeInput.value);
+        var endDatetime = new Date(endDatetimeInput.value);
+
+        // Check if start datetime is after end datetime
+        if (startDatetime > endDatetime) {
+            endDatetimeInput.value = startDatetimeInput.value;
+        }
+    });
+
+    // Add event listener to end datetime input
+    endDatetimeInput.addEventListener("change", function () {
+        var startDatetime = new Date(startDatetimeInput.value);
+        var endDatetime = new Date(endDatetimeInput.value);
+
+        // Check if end datetime is before start datetime
+        if (endDatetime < startDatetime) {
+            startDatetimeInput.value = endDatetimeInput.value;
+        }
+    });
+
+    //=========================================== add charges start ==============================================
+    var People_obj = document.getElementById("People");
+    var T_STAFFM_obj = document.getElementById("T_STAFFM");
+    var Places_obj = document.getElementById("Places");
+    var T_PLACEM_obj = document.getElementById("T_PLACEM");
+
+    T_STAFFM_obj.addEventListener('change', add_charge);
+    People_obj.addEventListener('click', remove_charge);
+
+    function add_charge(e) {
+
+        const selectedOpts = T_STAFFM_obj.selectedOptions;
+
+        for (let opt of selectedOpts) {
+
+            const cloned = opt.cloneNode(true);
+
+            // Check if option already exists
+            if (!People_obj.querySelector(`option[value="${cloned.value}"]`)) {
+                People_obj.appendChild(cloned);
+            }
+
+        }
+
+        T_STAFFM_obj.selectedIndex = -1;
+
+    }
+
+    function remove_charge(e) {
+
+        const selectedOpts = People_obj.selectedOptions;
+        for (let opt of selectedOpts) {
+            const value = opt.value;
+            const optionToRemove = People_obj.querySelector(`option[value="${value}"]`);
+            if (optionToRemove) {
+                People_obj.removeChild(optionToRemove);
+            }
+        }
+    }
+
+    //=============================================== add charges end =====================================
+
+    //=============================================== add places start ====================================
+    var Places = document.getElementById('Places');
+    var T_PLACEM = document.getElementById('T_PLACEM');
+
+    T_PLACEM.addEventListener('change', add_place);
+    Places.addEventListener('click', remove_place);
+
+    function add_place(e) {
+        const selectedOpts = T_PLACEM.selectedOptions;
+
+        for (let opt of selectedOpts) {
+
+            const cloned = opt.cloneNode(true);
+
+            // Check if option already exists
+            if (!Places.querySelector(`option[value="${cloned.value}"]`)) {
+                Places.appendChild(cloned);
+            }
+
+        }
+
+        T_PLACEM.selectedIndex = -1;
+
+    }
+
+    function remove_place(e) {
+
+        const selectedOpts = Places.selectedOptions;
+        console.log(e)
+        for (let opt of selectedOpts) {
+
+            const value = opt.value;
+
+            console.log(value)
+            const optionToRemove = Places.querySelector(`option[value="${value}"]`);
+
+            if (optionToRemove) {
+                Places.removeChild(optionToRemove);
+            }
+        }
+    }
+    //===================================================== add places end =====================================
+
+    function save_data() {
+        var schedule_no = 50;
+        var people_data = Array.from(People_obj.options).map(o => ({ schedule_no: parseInt(schedule_no), staf_cd: parseInt(o.value) }));
+        var places_data = Array.from(Places_obj.options).map(o => ({ schedule_no: parseInt(schedule_no), place_cd: parseInt(o.value) }));
+        var date = new Date();
+        var date1 = new Date();
+        var date2 = new Date();
+        var start_datetime = new Date($("#start_datetime").val());
+        start_datetime = new Date(start_datetime.setTime(start_datetime.getTime() - 8000 * 3600)).toISOString();
+        var end_datetime = new Date($("#end_datetime").val());
+        end_datetime = new Date(end_datetime.setTime(end_datetime.getTime() - 8000 * 3600)).toISOString();
+        var data = {
+            schedule_no: schedule_no,
+            schedule_type: parseInt($("#schedule_type").val()),
+            allday: $("#allday").prop("checked"),
+            start_datetime: start_datetime,
+            end_datetime: end_datetime,
+            title: $("#title").val(),
+            memo: $("#memo").val(),
+            update_user: "@User.FindFirst(web_groupware.Utilities.ClaimTypes.STAF_CD).Value",
+            update_date: new Date(date2.setTime(date2.getTime() - 8000 * 3600)).toISOString(),
+            People: people_data,
+            Places: places_data,
+        }
+        console.log(data);
+        $.ajax({
+            url: "Schedule_Create_Act",
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function (result) {
+                console.log(result)
+                window.location.href="Personal_week";
+            },
+            error: function (xhr) {
+                console.log(xhr.responseText);
+            }
+        });
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

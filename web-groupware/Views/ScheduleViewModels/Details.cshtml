@@ -1,0 +1,54 @@
+﻿@model web_groupware.Models.ScheduleViewModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>ScheduleViewModel</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.schedule_type)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.schedule_type)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.allday)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.allday)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.start_datetime)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.start_datetime)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.end_datetime)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.end_datetime)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.title)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.title)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.memo)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.memo)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.schedule_no">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

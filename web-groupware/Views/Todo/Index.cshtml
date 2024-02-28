@@ -1,0 +1,407 @@
+﻿@{
+    ViewData["Title"] = "ワークフロー ";
+}
+
+@model web_groupware.Models.TodoViewModel;
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box page-title-box-alt">
+            <h4 class="page-title">ワークフロー</h4>
+        </div>
+    </div>
+</div>
+
+
+<div class='card' style="padding-top: 25px">
+    <div class='d-flex gap-5 w-75'>
+        <div class="d-flex w-50 gap-0">
+            <label class=" my-auto text-center w-25">状態</label>
+            <select class="form-select w-50" aria-label="状態" id="select-response" onchange="filterResponse(value);">
+                <option value="" selected>All</option>
+                <option value=0>未対応</option>
+                <option value=1>対応中</option>
+                <option value=2>完了</option>
+            </select>
+        </div>
+        <div class="d-flex w-50">
+            <label class=" my-auto text-center w-25">期限</label>
+            <select class="form-select w-50" aria-label="期限" id="select-deadline" onchange="filterDeadline();">
+                <option value="" selected>未設定</option>
+                <option value=0>期限あり</option>
+                <option value=1>期限なし</option>
+            </select>
+        </div>
+        <div class="d-flex w-50">
+            <label class=" my-auto text-center w-25">担当者</label>
+            <select class="form-select w-50 " aria-label="担当者" id="select-manager" onchange="filterManager();">
+                <option value="" selected>未設定</option>
+                @* @foreach(var list in staf_name) *@
+            </select>
+        </div>
+    </div>
+
+    <div class="d-flex gap-1 mt-3 mx-5 w-25" role="button" tabindex="0" onclick="openAddModal()">
+        <div style="width: 20px; height:20px;">
+            <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#"
+                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:svg="http://www.w3.org/2000/svg"
+                xmlns="http://www.w3.org/2000/svg" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" version="1.1" x="0px" y="0px"
+                viewBox="0 0 100 125">
+                <g transform="translate(0,-952.36218)">
+                    <path
+                        style="font-size:medium;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-indent:0;text-align:start;text-decoration:none;line-height:normal;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;text-anchor:start;baseline-shift:baseline;opacity:1;color:#000000;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1.61208438999999990;marker:none;visibility:visible;display:inline;overflow:visible;enable-background:accumulate;font-family:Sans;-inkscape-font-specification:Sans"
+                        d="M 50 6.0625 C 25.532852 6.0625 5.875 25.88495 5.875 50 C 5.875 74.115 25.532852 93.9375 50 93.9375 C 74.467149 93.9375 94.09375 74.115 94.09375 50 C 94.09375 25.88495 74.467149 6.0625 50 6.0625 z M 50 9.90625 C 71.924783 9.90625 89.9375 27.7231 89.9375 50 C 89.9375 72.2769 71.924783 90.09375 50 90.09375 C 28.075218 90.09375 10.125 72.2769 10.125 50 C 10.125 27.7231 28.075218 9.90625 50 9.90625 z M 49.96875 31.09375 A 2.0002 2.0002 0 0 0 48 33.125 L 48 48 L 33.125 48 A 2.0002 2.0002 0 0 0 32.9375 48 A 2.0021961 2.0021961 0 1 0 33.125 52 L 48 52 L 48 66.84375 A 2.0002 2.0002 0 1 0 52 66.84375 L 52 52 L 66.875 52 A 2.0002 2.0002 0 1 0 66.875 48 L 52 48 L 52 33.125 A 2.0002 2.0002 0 0 0 49.96875 31.09375 z "
+                        transform="translate(0,952.36218)" />
+                </g>
+            </svg>
+        </div>
+        <span>新規登録</span>
+    </div>
+    <div>
+        @foreach (var item in Model.fileList)
+        {
+            <div class="border border-dark border-1 rounded-1 m-auto gap-2 my-1 d-flex justify-content-between w-50"
+                role="button" tabindex="0">
+                <div class="m-auto" style="width: 90%;" onclick="openModifyModal(@item.id)">
+                    <div class="d-flex justify-content-between fs-4 fw-bold my-1">
+                        <div>
+                            @if (item.title.Length <= 20)
+                            {
+                                <span>@item.title</span>
+                            }
+                            else
+                            {
+                                <span>@item.title.Substring(0, 20)</span>
+                                <span>...</span>
+                            }
+                        </div>
+                        <div class="d-flex text-end gap-5">
+                            <span>@((item.group_set == 0) ? "複数人" : "グループ")</span>
+
+                            <span>担当者</span>
+
+                            <span>@((item.deadline_set == 0) ? "期限なし" : "期限あり")</span>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between my-1">
+                        @if (item.description.Length <= 64)
+                        {
+                            <div class="w-75">@item.description</div>
+                        }
+                        else
+                        {
+                            <div class="w-75">
+                                <span>
+                                    @item.description.Substring(0, 60)
+                                </span>
+                                <span>...</span>
+                            </div>
+                        }
+                        @{
+                            switch (item.response_status)
+                            {
+                                case 0:
+                                    <div class="fs-4 fw-bold bg-warning rounded-pill px-2">
+                                        未対応
+                                    </div>
+                                    break;
+                                case 1:
+                                    <div class="fs-4 fw-bold bg-info rounded-pill px-2">
+                                        対応中
+                                    </div>
+                                    break;
+                                default:
+                                    <div class="fs-4 fw-bold bg-primary rounded-pill px-2">
+                                        完了
+                                    </div>
+                                    break;
+                            }
+                        }
+
+                    </div>
+                </div>
+                @if (item.sendUrl != null)
+                {
+                    <div class="d-flex m-auto" onclick="alert('alert')">
+                        <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12.5535 16.5061C12.4114 16.6615 12.2106 16.75 12 16.75C11.7894 16.75 11.5886 16.6615 11.4465 16.5061L7.44648 12.1311C7.16698 11.8254 7.18822 11.351 7.49392 11.0715C7.79963 10.792 8.27402 10.8132 8.55352 11.1189L11.25 14.0682V3C11.25 2.58579 11.5858 2.25 12 2.25C12.4142 2.25 12.75 2.58579 12.75 3V14.0682L15.4465 11.1189C15.726 10.8132 16.2004 10.792 16.5061 11.0715C16.8118 11.351 16.833 11.8254 16.5535 12.1311L12.5535 16.5061Z"
+                                fill="#1C274C" />
+                            <path
+                                d="M3.75 15C3.75 14.5858 3.41422 14.25 3 14.25C2.58579 14.25 2.25 14.5858 2.25 15V15.0549C2.24998 16.4225 2.24996 17.5248 2.36652 18.3918C2.48754 19.2919 2.74643 20.0497 3.34835 20.6516C3.95027 21.2536 4.70814 21.5125 5.60825 21.6335C6.47522 21.75 7.57754 21.75 8.94513 21.75H15.0549C16.4225 21.75 17.5248 21.75 18.3918 21.6335C19.2919 21.5125 20.0497 21.2536 20.6517 20.6516C21.2536 20.0497 21.5125 19.2919 21.6335 18.3918C21.75 17.5248 21.75 16.4225 21.75 15.0549V15C21.75 14.5858 21.4142 14.25 21 14.25C20.5858 14.25 20.25 14.5858 20.25 15C20.25 16.4354 20.2484 17.4365 20.1469 18.1919C20.0482 18.9257 19.8678 19.3142 19.591 19.591C19.3142 19.8678 18.9257 20.0482 18.1919 20.1469C17.4365 20.2484 16.4354 20.25 15 20.25H9C7.56459 20.25 6.56347 20.2484 5.80812 20.1469C5.07435 20.0482 4.68577 19.8678 4.40901 19.591C4.13225 19.3142 3.9518 18.9257 3.85315 18.1919C3.75159 17.4365 3.75 16.4354 3.75 15Z"
+                                fill="#1C274C" />
+                        </svg>
+                    </div>
+                }
+                else
+                {
+                    <div style="width: 35px;"></div>
+                }
+            </div>
+        }
+    </div>
+
+
+
+    <div>
+        <!-- Modal to modify workflow -->
+        <div class="modal fade" id="modify-modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header py-3 px-4 border-bottom-0 d-block">
+                        <button type="button" class="btn-close float-end" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                        <h5 class="modal-title" id="modal-title">ワークフロー</h5>
+                    </div>
+                    <div class="modal-body px-4 pb-4 pt-0">
+                        <!-- <form class="needs-validation" name="folder-form" id="form-folder" novalidate> -->
+
+                        <div>
+                            <div class="mb-3">
+                                <select class="form-select w-50" aria-label="" id='public'>
+                                    <option value=0>非公開</option>
+                                    <option value=1 selected>公開</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select w-50" aria-label="" id='group'>
+                                    <option value=0>複数人</option>
+                                    <option value=1 selected>グループ</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select w-50" aria-label="期限" id='deadline'>
+                                    <option value=0>期限なし</option>
+                                    <option selected value=1>期限あり</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="title" class="form-label">タイトル</label>
+                                <input type="text" class="form-control" id="title" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">説明</label>
+                                <textarea class="form-control" id="description" name="description"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="file" class="form-label w-75">Select File</label>
+                                <input type="file" class="form-control w-75" id="file" name="file"
+                                    onchange="showFileName(this)">
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select w-50" aria-label="状態" id="response">
+                                    <option value=0 selected>未対応</option>
+                                    <option value=1>対応中</option>
+                                    <option value=2>完了</option>
+                                </select>
+                            </div>
+                            <!-- <button type="submit" class="btn btn-primary">Upload</button> -->
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <button class="btn btn-success rounded-20" onclick="itemUpdate();">更新</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- </form> -->
+                    </div>
+                </div> <!-- end modal-content-->
+            </div> <!-- end modal dialog-->
+        </div>
+        <!-- end modal-->
+        <!-- Modal to create workflow -->
+        <div class="modal fade" id="create-modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header py-3 px-4 border-bottom-0 d-block">
+                        <button type="button" class="btn-close float-end" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                        <h5 class="modal-title" id="modal-title">ワークフロー</h5>
+                    </div>
+                    <div class="modal-body px-4 pb-4 pt-0">
+                        <!-- <form class="needs-validation" name="folder-form" id="form-folder" novalidate> -->
+
+                        <div>
+                            <div class="mb-3">
+                                <select class="form-select w-50" aria-label="" id="s_public">
+                                    <option value=0>非公開</option>
+                                    <option value=1 selected>公開</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select w-50" aria-label="" id="s_group">
+                                    <option value=0>複数人</option>
+                                    <option value=1 selected>グループ</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select w-50" aria-label="期限" id="s_deadline">
+                                    <option value="0">期限なし</option>
+                                    <option selected value=1>期限あり</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="title" class="form-label">タイトル</label>
+                                <input type="text" class="form-control" id="s_title" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="description" class="form-label">説明</label>
+                                <textarea class="form-control" id="s_description"></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="file" class="form-label w-75">Select File</label>
+                                <input type="file" class="form-control w-75" id="s_file" name="file"
+                                    onchange="showFileName(this)">
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select w-50" aria-label="状態" id="s_response" disabled>
+                                    <option value="0" selected>未対応</option>
+                                    <option value=1>対応中</option>
+                                    <option value=2>完了</option>
+                                </select>
+                            </div>
+                            <!-- <button type="submit" class="btn btn-primary">Upload</button> -->
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <button type="submit" class="btn btn-success rounded-20" id="btn-save-event"
+                                        onclick="itemSend();">コメ ントする</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- </form> -->
+                    </div>
+                </div> <!-- end modal-content-->
+            </div> <!-- end modal dialog-->
+        </div>
+        <!-- end modal-->
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        var itemId, fileName;
+        function showFileName(file) {
+            fileName = file.files[0].name;
+            document.getElementById("filename").innerHTML = fileName;
+            $('#upload').prop('disabled', false);
+        }
+
+        function openAddModal() {
+            $('#create-modal').modal('show');
+        }
+
+        function itemSend() {
+            var fileInput = $('#s_file')[0];
+            var file = fileInput.files[0];
+            fileSave(file);
+
+            var data = {
+                sendUrl: fileName,
+                title: $('#s_title').val(),
+                description: $('#s_description').val(),
+                public_set: $('#s_public').val(),
+                group_set: $('#s_group').val(),
+                deadline_set: $('#s_deadline').val(),
+                response_status: $('#s_response').val()
+            };
+            $.ajax({
+                method: "post",
+                url: 'Todo/Create',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+
+                success: function (result) {
+                    window.location.reload();
+                },
+                error: function (xhr) {
+                    console.log("error:  " + xhr.responseText);
+                }
+            });
+        }
+
+        function fileSave(file) {
+            var formData = new FormData();
+            formData.append("file", file);
+            $.ajax({
+                url: "/Todo/fileSave",
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    console.log("File uploaded successfully!");
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error uploading file: " + error);
+                }
+            });
+        }
+
+        function openModifyModal(id) {
+            $('#modify-modal').modal('show');
+            $.ajax({
+                method: "get",
+                url: "Todo/itemGet?id=" + id,
+                success: function (result) {
+                    $('#public').val(result.public_set);
+                    $('#description').val(result.description);
+                    $('#title').val(result.title);
+                    $('#group').val(result.group_set);
+                    $('#deadline').val(result.deadline_set);
+                    $('#response').val(result.response_status);
+                    $('#file').val(result.sendUrl);
+                        itemId = result.id;
+                },
+                error: function (xhr) {
+                    console.error("Error: " + xhr.responseText);
+                }
+            });
+        }
+
+        function itemUpdate() {
+            var data = {
+                id: itemId,
+                public_set: $('#public').val(),
+                description: $('#description').val(),
+                title: $('#title').val(),
+                group_set: $('#group').val(),
+                deadline_set: $('#deadline').val(),
+                response_status: $('#response').val()
+            };
+            $.ajax({
+                method: "post",
+                url: 'Todo/Update',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+
+                success: function (result) {
+                    window.location.reload();
+                },
+                error: function (xhr) {
+                    console.log("error:  " + xhr.responseText);
+                }
+            });
+        }
+
+        @* function filterResponse() {
+        var id = $('#select-response').val();
+        console.log(typeof(id))
+        $.ajax({
+        method: "get",
+        url: "Todo/Response?id=" + id,
+        success: function (result) {
+        console.log("===========", result)
+        },
+        error: function (xhr) {
+        console.error("Error: ");
+        }
+        });
+        } *@
+
+            function downloadFile(id) {
+                window.location.href = '@Url.Action("DownloadFile", "WorkFlow")' + '?id=' + id;
+            }
+    </script>
+}

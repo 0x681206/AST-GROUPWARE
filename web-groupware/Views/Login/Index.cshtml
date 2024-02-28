@@ -1,0 +1,83 @@
+﻿@model web_groupware.Models.LoginViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@addTagHelper *, YourApplicationNamespace
+@{
+    ViewData["Title"] = "ログイン";
+    Layout = null;
+}
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - グループウェア</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/web_groupware.styles.css" asp-append-version="true" />
+    <link href="~/lib/material-design-icons/materialdesignicons.min.css" rel="stylesheet" />
+    <link href="~/lib/material-design-icons/pe-icon-7-stroke.css" rel="stylesheet" />
+    <link rel="icon" href="~/favicon.ico"/>
+</head>
+<body>
+    <div class="auth-fluid">
+        <div class="auth-fluid-right">
+            <div class="auth-user-testimonial">
+                <h3 class="mb-3 text-white">@Model.title</h3>
+                <p class="lead fw-normal">
+                    @Model.message
+                </p>
+            </div>
+        </div>
+        <div class="auth-fluid-form-box">
+            <div class="align-items-center d-flex h-100">
+                <div class="card-body">
+                    <div class="text-center mb-5">
+                        <img src="~/images/logo_ast_3.png" style="object-fit: contain;max-width:100%; display: inline-block;" />
+                    </div>
+                    <h4 class="mt-0 mb-4 text-center">サインイン</h4>
+                    <form asp-controller="Login" asp-action="Index">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="form-group">
+                            <label asp-for="mail" class="control-label"></label>
+                            <input type="text" asp-for="mail" class="form-control" />
+                            <span asp-validation-for="mail" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="password" class="control-label"></label>
+                            <input asp-for="password" class="form-control" />
+                            <span asp-validation-for="password" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="checkbox" asp-for="remember" class="check" />
+                            <label asp-for="remember" class="control-label"></label>
+                            <span asp-validation-for="remember" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="ログイン" class="btn btn-primary" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+<style>
+    .form-group {
+        padding: 5px
+    }
+</style>
+<script type="text/javascript" asp-append-version="true">
+    if (!(window == window.parent)) {
+        parent.window.location.href = parent.window.location.href;
+    }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.20.0/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

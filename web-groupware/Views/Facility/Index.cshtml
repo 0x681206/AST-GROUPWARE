@@ -1,0 +1,316 @@
+@model web_groupware.Models.FacilityDetailViewModel
+@{
+    ViewData["Title"] = "施設予約";
+}
+
+@section Styles {
+    <link href="~/css/schedule/bootstrap.main.min.css" rel="stylesheet" />
+}
+
+<style>
+    .fc-button{
+        background-color: #02a8b5 !important;
+        border-color: #02a8b5 !important;
+    }
+</style>
+<script src="~/js/schedule/bootstrap.main.min.js"></script>
+
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box page-title-box-alt">
+            <h4 class="page-title">施設予約</h4>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-xl-3">
+                        <div class="d-grid">
+                            <button class="btn btn-lg font-16 btn-primary" onclick="addEvent()">
+                                <i class="mdi mdi-plus-circle-outline"></i> 新規登録
+                            </button>
+                        </div>
+                    </div> <!-- end col-->
+
+                    <div class="col-xl-12">
+                        <div class="mt-4 mt-xl-0">
+                            <div id="calendar"></div>
+                        </div>
+                    </div> <!-- end col -->
+
+                </div>  <!-- end row -->
+            </div> <!-- end card body-->
+        </div> <!-- end card -->
+        <!-- Add New Event MODAL -->
+        <div class="modal fade" id="schedule-event-modal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header py-3 px-4 border-bottom-0 d-block">
+                        <button type="button" class="btn-close float-end" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title" id="modal-title">Event</h5>
+                    </div>
+                    <div class="modal-body px-4 pb-4 pt-0">
+                        <form name="event-form" id="form-event" novalidate>
+                            <div class="row">
+                                <div asp-validation-summary="ModelOnly" class="invalid-feedback block"></div>
+                                <div class="col-12">
+                                    <div class="mb-2">
+                                        <input class="form-control" type="hidden" id="schedule_no" value="" />
+                                        <label class="control-label form-label">開始時間</label>
+                                        <input class="form-control" asp-for="@Model.Schedule.start_datetime" />
+                                        <span asp-validation-for="@Model.Schedule.start_datetime" class="invalid-feedback block"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mb-2">
+                                        <label class="control-label form-label">終了時間</label>
+                                        <input class="form-control" asp-for="@Model.Schedule.end_datetime" />
+                                        <span asp-validation-for="@Model.Schedule.end_datetime" class="invalid-feedback block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="mb-2">
+                                        <label class="control-label form-label">対応者</label>
+                                        <select class="form-control form-select" id="staff_category">
+                                            <option value="" selected>--</option>
+                                            @foreach (T_STAFFM item in Model.StaffMs)
+                                            {
+                                                <option value="@item.staf_cd">@item.staf_name</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="@Model.Schedule.schedule_type" class="invalid-feedback block"></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="mb-2">
+                                        <label class="control-label form-label">施設</label>
+                                        <select class="form-control form-select" id="place_category">
+                                            <option value="" selected>--</option>
+                                            @foreach (T_PLACEM item in Model.PlaceMs)
+                                            {
+                                                <option value="@item.place_cd">@item.place_name</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="@Model.Schedule.schedule_type" class="invalid-feedback block"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <div class="mb-2">
+                                        <label class="control-label form-label">タイプ</label>
+                                        <select class="form-control form-select" id="event-category">
+                                            <option value="" selected>--</option>
+                                            <option value="1">会議</option>
+                                            <option value="2">来客</option>
+                                            <option value="3">外出</option>
+                                            <option value="4">出張</option>
+                                            <option value="5">休み</option>
+                                        </select>
+                                        <span asp-validation-for="@Model.Schedule.schedule_type" class="invalid-feedback block"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mb-2">
+                                        <label class="control-label form-label">タイトル</label>
+                                        <input class="form-control" asp-for="@Model.Schedule.title" />
+                                        <span asp-validation-for="@Model.Schedule.title" class="invalid-feedback block"></span>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="mb-2">
+                                        <label class="control-label form-label">メモ</label>
+                                        <textarea class="form-control" asp-for="@Model.Schedule.memo"></textarea>
+                                        <span asp-validation-for="@Model.Schedule.memo" class="invalid-feedback block"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row mt-2">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-danger" id="btn-delete-event" onclick="onDelete()">Delete</button>
+                                </div>
+                                <div class="col-6 text-end">
+                                    <button type="button" class="btn btn-light me-1" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" onclick="onSubmit()" class="btn btn-success" id="btn-save-event">Save</button>
+                                    <button type="button" onclick="onEdit()" class="btn btn-success" id="btn-update-event">Update</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div> 
+            </div> 
+        </div>
+    </div>
+    <!-- end col-12 -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar-scheduler/index.global.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                timeZone: 'Local',
+                initialView: 'resourceTimelineDay',
+                themeSystem: 'bootstrap5',
+                aspectRatio: 1.5,
+                headerToolbar: {
+                    left: 'prev,next',
+                    center: 'title',
+                    right: 'resourceTimelineDay,resourceTimelineWeek,resourceTimelineMonth',
+                },
+            
+                editable: true,
+                locale: "ja",
+                droppable: true, 
+                eventLimit: true,
+                selectable: true,
+                resourceAreaHeaderContent: '施設',
+                resources: @Html.Raw(Json.Serialize(Model.PlaceMs.Select(item => new { id = item.place_cd, title = item.place_name }))),
+                events: function (info, successCallback, errorCallback) {
+                    $.ajax({
+                        url: '@Url.Action("GetPersonal", "Facility")',
+                        type: 'GET',
+                        success: function (response) {
+                            const event_data = [];
+                            for (let i = 0; i < response.length; i++) {
+                                event_data.push({
+                                    "resourceId": response[i]["place"]["place_cd"],
+                                    "title": response[i]["schedule"]["title"],
+                                    "start": response[i]["schedule"]["start_datetime"],
+                                    "end": response[i]["schedule"]["end_datetime"],
+                                    "id": response[i]["schedule"]["schedule_no"]
+                                })
+                            }
+                            successCallback(event_data);
+                        },
+                        error: function (error) {
+                            console.log(error);
+                            errorCallback([])
+                        }
+                    })
+                },
+                droppable: true,
+
+                eventClick: function(info) {
+                    const schedule_no = info.event._def.publicId;
+                    $.ajax({
+                        url: '@Url.Action("GetScheduleInfo", "Facility")',
+                        type: 'POST',
+                        data: {
+                            schedule_no: schedule_no
+                        },
+                        success: function (response) {
+                            $("#event-category").val(response.schedule.schedule_type);
+                            $("#Schedule_start_datetime").val(response.schedule.start_datetime);
+                            $("#Schedule_end_datetime").val(response.schedule.end_datetime);
+                            $("#Schedule_title").val(response.schedule.title);
+                            $("#Schedule_memo").val(response.schedule.memo);
+                            $("#staff_category").val(response.facility.staf_cd); 
+                            $("#place_category").val(response.facility.place_cd);
+                            $("#btn-delete-event").css("display", "inline-block");
+                            $("#btn-save-event").css("display", "none");
+                            $("#btn-update-event").css("display", "inline-block");
+                            $("#schedule_no").val(response.schedule.schedule_no)
+                            $("#schedule-event-modal").modal("show");
+                        },
+                        error: function (error) {
+                            console.log(error);
+                        }
+                    })
+                },
+                aspectRatio: 1.5,
+            });
+
+            calendar.render();
+        });
+    
+        function onSubmit(){
+            const data = {
+                schedule_type: $('#event-category').val(),
+                start_datetime: $('#Schedule_start_datetime').val(),
+                end_datetime: $('#Schedule_end_datetime').val(),
+                title: $('#Schedule_title').val(),
+                memo: $('#Schedule_memo').val(),
+                staf_cd: $('#staff_category').val(),
+                place_cd: $('#place_category').val()
+            };
+            $.ajax({
+                url: '@Url.Action("Create", "Facility")',
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    window.location.reload(true);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function addEvent() {
+            $("#event-category").val("");
+            $("#Schedule_start_datetime").val("");
+            $("#Schedule_end_datetime").val("");
+            $("#Schedule_title").val("");
+            $("#Schedule_memo").val("");
+            $("#staff_category").val("");
+            $("#place_category").val("");
+            $("#btn-update-event").css("display", "none");
+            $("#btn-delete-event").css("display", "none");
+            $("#btn-save-event").css("display", "inline-block");
+            $("#schedule-event-modal").modal("show");
+        }
+
+        function onEdit(){
+            const data = {
+                edit_schedule_no: $("#schedule_no").val(),
+                schedule_type: $('#event-category').val(),
+                start_datetime: $('#Schedule_start_datetime').val(),
+                end_datetime: $('#Schedule_end_datetime').val(),
+                title: $('#Schedule_title').val(),
+                memo: $('#Schedule_memo').val(),
+                staf_cd: $('#staff_category').val(),
+                place_cd: $('#place_category').val()
+            };
+            $.ajax({
+                url: '@Url.Action("Edit", "Facility")',
+                type: 'POST',
+                data: data,
+                success: function (response) {
+                    window.location.reload(true);
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+
+        function onDelete() { 
+            $.ajax({
+                url: '@Url.Action("Delete", "Facility")',
+                type: 'POST',
+                data: {
+                    schedule_no: $("#schedule_no").val()
+                },
+                success: function (response) {
+                    if (response === 'success') { 
+                        window.location.reload(true);
+                    }
+                },
+                error: function (error) {
+                    console.log(error);
+                }
+            });
+        }
+        
+    </script>
+    
+</div> <!-- end row -->
+
+@section Scripts {
+    <script src="~/js/schedule/bootstrap.main.min.js"></script>
+}
